@@ -136,6 +136,11 @@ const proxyEvent = (name, detail = {}) => {
   window.postMessage({ name, detail }, 'https://tweetdeck.twitter.com');
 };
 
+/**
+ * Adds fields to a given chirp, fields that will be used by the content script later
+ * @param  {Object} chirp The chirp we want to decorate
+ * @return Object         The decorated chirp
+ */
 const decorateChirp = (chirp) => {
   if (!chirp) {
     return undefined;
