@@ -1,3 +1,9 @@
+/* eslint no-console: ["error", { allow: ["log"] }] */
+/*
+ *
+ * This script is used to pack the extension into .crx and .nex files for release
+ *
+ */
 const chalk = require('chalk');
 const clog = (color, ...args) => console.log(chalk[color](...args));
 const fs = require('fs');
