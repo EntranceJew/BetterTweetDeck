@@ -3,6 +3,8 @@ import { debug } from './util/logger';
 
 let SETTINGS;
 
+// We re-add the Like/RTs indicator on single tweets since TD removed them at some point.
+// The only reliable way to do that is to perform a search and replace on the templates themselves, unfortunately
 TD.mustaches['status/tweet_single.mustache'] = TD.mustaches['status/tweet_single.mustache'].replace('{{>status/tweet_single_footer}} </div> </div>', '{{>status/tweet_single_footer}} </div> <i class="sprite tweet-dogear"></i></div>');
 TD.mustaches['status/tweet_detail.mustache'] = TD.mustaches['status/tweet_detail.mustache'].replace('</footer> {{/getMainTweet}}', '</footer> {{/getMainTweet}} <i class="sprite tweet-dogear"></i>');
 
