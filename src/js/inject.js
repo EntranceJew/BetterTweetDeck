@@ -84,9 +84,13 @@ const getChirpFromKey = (key, colKey) => {
 
 if (config.get('Client.debug')) {
   /**
-   * Takes a node and fetches the chirp associated with it (useful for debugging)
+   * When given a node in the DOM, tries to look for the corresponding chirp (useful for debug)
+   * @param  {DOMElement} element The node we want to inspect
+   * @return Object               The chirp we found (or not)
    */
   window._BTDinspectChirp = (element) => {
+    // If the node doesn't have a parent with a data-key or a data-column then it doesn't
+    // have a chirp
     if (!element.closest('[data-key]') || !element.closest('[data-column]')) {
       throw new Error('Not a chirp');
     }
@@ -94,6 +98,7 @@ if (config.get('Client.debug')) {
     const colKey = element.closest('[data-column]').getAttribute('data-column');
     const chirpKey = element.closest('[data-key]').getAttribute('data-key');
 
+    // We simply call getChirpFromKey with the chirp key and the column key
     return getChirpFromKey(chirpKey, colKey);
   };
 
