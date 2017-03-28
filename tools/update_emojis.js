@@ -1,3 +1,8 @@
+/*
+ * This script will fetch `emoji.json` from the emoji-data repo and output a emojis.js file.
+ * The said file will be used for the emoji picker.
+ */
+
 const needle = require('needle');
 const _ = require('lodash');
 const jsEmoji = require('js-emoji');
@@ -5,18 +10,28 @@ const Emoji = new jsEmoji.EmojiConvertor();
 const fs = require('fs');
 Emoji.img_set = 'twitter';
 
+/**
+ * Will output the unicode character(s) for a given emoji object
+ * @param  [Object] emoji   The emoji object to convert
+ * @return [String]         The unicode string corresponding to the emoji
+ */
 function getUnified(emoji) {
+  // Set the replace_mode of Emoji to `unified`
   Emoji.replace_mode = 'unified';
 
+  // Wrap the shortname around colons so we can convert it
   const converted = Emoji.replace_colons(`:${emoji.s}:`);
 
+  // If the emoji is correctly converted, we return it
   if (converted !== `:${emoji.s}:` && !converted.startsWith('<img')) {
     return converted;
   }
 
+  // Otherwise we return null
   return null;
 }
 
+// Categories in the picker have to be in a certain order
 const catOrder = {
   People: -80,
   Nature: -70,
@@ -28,6 +43,7 @@ const catOrder = {
   Flags: -10,
 };
 
+// Some emojis don't have the right category, we fix that here
 const getMissingCategory = (shortName) => {
   if (shortName === 'keycap_star') {
     return 'Symbols';
