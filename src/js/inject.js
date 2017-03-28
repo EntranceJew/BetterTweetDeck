@@ -106,12 +106,21 @@ if (config.get('Client.debug')) {
 }
 
 /**
- * Send messages to the content window with BTDC_ prefix
+ * Proxies events to the content script with a 'BTDC_' prefix
+ * @param  {String} name        Name of the event
+ * @param  {Object} detail      Data attached to the event
  */
 const proxyEvent = (name, detail = {}) => {
+  // We change the name of our event
   name = `BTDC_${name}`;
+  // Here we have to do some custom stringify on the data as it can contain chirps.
+  // Since chirps are full of prototypes, it would otherwise trigger circular dependencies.
+  //
+  // For that, we define a cache
   let cache = [];
+
   detail = JSON.stringify(detail, (key, val) => {
+    // If we encounter an object, we check its present in cache or not
     if (typeof val === 'object' && val !== null) {
       if (cache.indexOf(val) !== -1 && !val.screenName) {
         return null;
@@ -121,7 +130,9 @@ const proxyEvent = (name, detail = {}) => {
 
     return val;
   });
+
   cache = null;
+
   window.postMessage({ name, detail }, 'https://tweetdeck.twitter.com');
 };
 
