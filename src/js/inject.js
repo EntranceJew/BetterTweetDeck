@@ -6,49 +6,72 @@ let SETTINGS;
 TD.mustaches['status/tweet_single.mustache'] = TD.mustaches['status/tweet_single.mustache'].replace('{{>status/tweet_single_footer}} </div> </div>', '{{>status/tweet_single_footer}} </div> <i class="sprite tweet-dogear"></i></div>');
 TD.mustaches['status/tweet_detail.mustache'] = TD.mustaches['status/tweet_detail.mustache'].replace('</footer> {{/getMainTweet}}', '</footer> {{/getMainTweet}} <i class="sprite tweet-dogear"></i>');
 
+/**
+ * Returns the chirp (tweet) object when given a key and a column key
+ * @param  {String} key      The chirp key
+ * @param  {String} colKey   The column key
+ * @return [Object]          The chirp
+ */
 const getChirpFromKey = (key, colKey) => {
+  // We try to find the column using its key
   const column = TD.controller.columnManager.get(colKey);
 
+  // If we don't find the column, we can't go further and we return null
   if (!column) {
     return null;
   }
 
+  // We build an array of "potential chirps" that we will scan to find our chirp
   const chirpsArray = [];
+
+  // Every single tweet, messages and whatnot is stored inside the `updateIndex` field on a column
   Object.keys(column.updateIndex).forEach(updateKey => {
-    const c = column.updateIndex[updateKey];
-    if (c) {
-      chirpsArray.push(c);
+    // We get the potential chirp inside the array
+    const potentialChirp = column.updateIndex[updateKey];
+
+    // If we found something, we push it in `chirpsArray`
+    if (potentialChirp) {
+      chirpsArray.push(potentialChirp);
     }
 
-    if (c && c.retweetedStatus) {
-      chirpsArray.push(c.retweetedStatus);
+    // If the chirp has a retweetedStatus (= it is actually a retweet), then we add that to the candidate list
+    if (potentialChirp && potentialChirp.retweetedStatus) {
+      chirpsArray.push(potentialChirp.retweetedStatus);
     }
 
-    if (c && c.quotedTweet) {
-      chirpsArray.push(c.quotedTweet);
+    // If the chirp has a quotedTweet (= it contains a quoted tweet), then we add that to the candidate list
+    if (potentialChirp && potentialChirp.quotedTweet) {
+      chirpsArray.push(potentialChirp.quotedTweet);
     }
 
-    if (c && c.messages) {
-      chirpsArray.push(...c.messages);
+    // If the chirp has a messages field (= the chirp is actually a messages thread), then we add all of them in the candidate array
+    if (potentialChirp && potentialChirp.messages) {
+      chirpsArray.push(...potentialChirp.messages);
     }
 
-    if (c && c.targetTweet) {
-      chirpsArray.push(c.targetTweet);
+    // If the chirp has a targetTweet (= chirp is actually an action (like, RT, etc) on a tweet), we add that to the candidate array
+    if (potentialChirp && potentialChirp.targetTweet) {
+      chirpsArray.push(potentialChirp.targetTweet);
     }
   });
 
+  // If the current column actually has details of a tweet opened, we look inside of that
   if (column.detailViewComponent) {
+    // `repliesTo` here designates all the tweet /before/ the detailed tweet in the thread
     if (column.detailViewComponent.repliesTo && column.detailViewComponent.repliesTo.repliesTo) {
       chirpsArray.push(...column.detailViewComponent.repliesTo.repliesTo);
     }
 
+    // `replies` here designates all the tweet /after/ the detailed tweet in the thread
     if (column.detailViewComponent.replies && column.detailViewComponent.replies.replies) {
       chirpsArray.push(...column.detailViewComponent.replies.replies);
     }
   }
 
+  // We have all the possible chirps, now we loop through our candidate and match using the id we were given
   const chirp = chirpsArray.find(c => c.id === String(key));
 
+  // If we don't find anything, output a debug statement
   if (!chirp) {
     debug(`did not find chirp ${key} within ${colKey}`);
     return null;
