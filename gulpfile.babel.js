@@ -21,6 +21,7 @@ import cssnext from 'postcss-cssnext';
 import cssnano from 'cssnano';
 import nested from 'postcss-nested';
 
+// All our static files
 const staticFiles = [
   'icons/*.png',
   'emojis/sheet_twitter_64.png',
@@ -30,19 +31,26 @@ const staticFiles = [
   '_locales/**/*'
 ].map((i) => path.resolve('src/', i));
 
+// Files to lint 
 const toLintFiles = [
   'src/js/**/*.js',
   '*.js',
 ];
 
+// Our PostCSS plugins
 const postCssPlugins = [
+  // Allows to do the @import statements in the CSS
   require('postcss-import'),
+  // Allows future CSS feature like color() and else
   cssnext,
+  // Allows to nest the CSS à-la LESS/Sass
   nested,
+  // Rebase the URL
   require('postcss-url')({
     url: 'inline',
     from: './src/css/index.css'
   }),
+  // Compress the CSS output
   cssnano({ autoprefixer: false, zindex: false }),
 ];
 
