@@ -8,6 +8,7 @@ import * as Templates from './util/templates';
 import * as Usernames from './util/usernames';
 import * as Emojis from './util/emojis';
 import * as Log from './util/logger.js';
+import * as Fonts from './util/fonts';
 
 import { $, TIMESTAMP_INTERVAL, on, sendEvent } from './util/util';
 
@@ -28,6 +29,15 @@ document.head.appendChild(scriptEl);
 
 sendMessage({ action: 'get_settings' }, (response) => {
   settings = response.settings;
+
+  if (Fonts.hasFont(settings.custom_font)) {
+    const styleString = Fonts.getCSSForFont(settings.custom_font);
+
+    const styleNode = document.createElement('style');
+    styleNode.innerHTML = styleString;
+
+    document.body.appendChild(styleNode);
+  }
 });
 
 

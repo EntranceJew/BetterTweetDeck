@@ -49,6 +49,7 @@ const defaultSettings = {
     enabled: true,
     short_txt: false,
   },
+  custom_font: '',
   old_replies: false,
   thumbnails: {},
 };
